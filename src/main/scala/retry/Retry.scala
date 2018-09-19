@@ -50,8 +50,8 @@ trait Retryable[T] {
   * @tparam T
   */
 abstract class BaseRetry[T](retries: Int, initialDelay: FiniteDuration, ec: ExecutionContext, scheduler: Scheduler) extends Retryable[T] {
-  var _ec: ExecutionContext = ec
-  var _scheduler: Scheduler = scheduler
+  private var _ec: ExecutionContext = ec
+  private var _scheduler: Scheduler = scheduler
   protected var block : () => Future[T] = _
   protected var predicate : T => Boolean = _
 
