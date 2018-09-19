@@ -1,0 +1,10 @@
+target/
+logs/
+*.lock
+.DS_Store
+.history
+.idea
+.idea_modules
+/.classpath
+/.project
+/.settings
