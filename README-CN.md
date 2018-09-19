@@ -1,5 +1,5 @@
-# Play-Util 介绍
-`Play-Util` 是一个专门为 [Play Framework](https://www.playframework.com/) 开发的实用工具包模块，目前已实现如下功能：
+# Play-Utils 介绍
+`Play-Utils` 是一个专门为 [Play Framework](https://www.playframework.com/) 开发的实用工具包模块，目前已实现如下功能：
 -  `Retry` 自动请求重试 
 
 # 1 Retry 
