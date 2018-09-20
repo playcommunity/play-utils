@@ -50,6 +50,7 @@ trait Retryable[T] {
   * @tparam T
   */
 abstract class BaseRetry[T](retries: Int, initialDelay: FiniteDuration, ec: ExecutionContext, scheduler: Scheduler) extends Retryable[T] {
+  private var _retries = retries
   private var _ec: ExecutionContext = ec
   private var _scheduler: Scheduler = scheduler
   protected var block : () => Future[T] = _
@@ -92,7 +93,8 @@ abstract class BaseRetry[T](retries: Int, initialDelay: FiniteDuration, ec: Exec
     */
   def retryWhen(predicate: T => Boolean): Future[T] = {
     this.predicate = predicate
-    retry(retries, initialDelay, () => block())(_ec, _scheduler)
+    _retries = retries
+    Future(retry(initialDelay, () => block())(_ec, _scheduler))(_ec).flatten
   }
 
   /**
@@ -102,27 +104,33 @@ abstract class BaseRetry[T](retries: Int, initialDelay: FiniteDuration, ec: Exec
     */
   def stopWhen(predicate: T => Boolean): Future[T] = {
     this.predicate = predicate
-    retry(retries, initialDelay, () => block())(_ec, _scheduler)
+    _retries = retries
+    Future(retry(initialDelay, () => block())(_ec, _scheduler))(_ec).flatten
   }
 
   /**
     * Retry and check the result with the predicate condition. Continue retrying if an exception is thrown.
-    * @param block the operation which return Future[T].
+    * Imagine that, if the retry method contains a retries parameter, when the result of after(...) expression is a Future[Throwable], then the body of recoverWith will continue with the same retries.
+    * So retries parameter should be removed form retry method, we use an internal _retries to track the retry count.
+    * @param block the operation which returns Future[T].
     * @return the successful Future[T] or the last retried result.
     */
-  private def retry(retries: Int, delay: FiniteDuration, block: () => Future[T])(implicit ec: ExecutionContext, scheduler: Scheduler): Future[T] = {
-    val f = block()
+  private def retry(delay: FiniteDuration, block: () => Future[T])(implicit ec: ExecutionContext, scheduler: Scheduler): Future[T] = {
+    _retries -= 1
+    val f = try { block() } catch { case t => Future.failed(t) }
     f.flatMap{ res =>
-      if (retries <= 0 || predicate(res)) {
+      if (_retries < 0 || predicate(res)) {
         f
       } else {
         val nextDelayTime = nextDelay(delay)
-        after(nextDelayTime, scheduler)(retry(retries - 1, nextDelayTime, block))
+        after(nextDelayTime, scheduler)(retry(nextDelayTime, block))
       }
-    }.recoverWith { case _ if retries > 0 => {
-      val nextDelayTime = nextDelay(delay)
-      after(nextDelayTime, scheduler)(retry(retries - 1, nextDelayTime, block))
-    }}
+    }.recoverWith {
+      case _ if _retries >= 0 => {
+        val nextDelayTime = nextDelay(delay)
+        after(nextDelayTime, scheduler)(retry(nextDelayTime, block))
+      }
+    }
   }
 
   /**
