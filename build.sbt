@@ -1,7 +1,7 @@
 
 name := "play-utils"
 
-version := "0.1.0"
+version := "0.2.0"
 
 scalaVersion := "2.12.6"
 
@@ -15,7 +15,7 @@ homepage := Some(url("https://github.com/playcommunity/play-utils"))
 
 playBuildRepoName in ThisBuild := "play-utils"
 
-version in ThisBuild := "0.1.0"
+version in ThisBuild := "0.2.0"
 
 val akkaActor = "com.typesafe.akka" %% "akka-actor" % "2.5.4"
 val playGuice = "com.typesafe.play" %% "play-guice" % "2.6.5"
