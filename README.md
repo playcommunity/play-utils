@@ -1,11 +1,15 @@
 # Introduction
-`Play-Utils` is an utility kit for [Play Framework](https://www.playframework.com/), including the following features：
+`Play-Utils` is a set of utilities for developing with [Play Framework](https://www.playframework.com/), including the following features:
 -  `Retry` retry request automatically with different strategies
 
 # 1 Retry 
 `Retry` utility is used to retry request automatically with different strategies, and finally return the success result or the last retried result.
 
 ## 1.1 Get started
+Add the following dependency to your `build.sbt`:
+```
+libraryDependencies += "cn.playscala" %% "play-utils" % "0.1.0"
+```
 FixedDelayRetry is the simplest retry strategy, it retries the next request with the same delay. Before coding, the instance of `Retry` should be injected where is needed: 
 ```
 class ExternalService @Inject()(retry: Retry)

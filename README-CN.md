@@ -6,6 +6,10 @@
 `Retry` 工具包可以帮助你设置不同的重试策略，自动重试失败的请求，最终返回成功的结果或者是最后一次重试结果。
 
 ## 1.1 基本用法
+将以下依赖添加至`build.sbt`文件:
+```
+libraryDependencies += "cn.playscala" %% "play-utils" % "0.1.0"
+```
 最简单的重试策略是固定时间重试，即每次重试的时间间隔相同。 在开始编码之前，你需要将`Retry`实例依赖注入到需要的地方：
 ```
 class ExternalService @Inject()(retry: Retry)
