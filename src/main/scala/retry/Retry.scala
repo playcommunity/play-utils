@@ -94,7 +94,7 @@ abstract class BaseRetry[T](retries: Int, initialDelay: FiniteDuration, ec: Exec
   def retryWhen(predicate: T => Boolean): Future[T] = {
     this.predicate = predicate
     _retries = retries
-    Future(retry(initialDelay, () => block())(_ec, _scheduler))(_ec).flatten
+    Future(retry(initialDelay, () => block())(_ec, _scheduler))(_ec).flatMap(f => f)(_ec)
   }
 
   /**
@@ -105,7 +105,7 @@ abstract class BaseRetry[T](retries: Int, initialDelay: FiniteDuration, ec: Exec
   def stopWhen(predicate: T => Boolean): Future[T] = {
     this.predicate = predicate
     _retries = retries
-    Future(retry(initialDelay, () => block())(_ec, _scheduler))(_ec).flatten
+    Future(retry(initialDelay, () => block())(_ec, _scheduler))(_ec).flatMap(f => f)(_ec)
   }
 
   /**
