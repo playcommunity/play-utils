@@ -1,5 +1,5 @@
 # Welcome!
-For chinese introduction, please refer to [README-CN.md](https://github.com/playcommunity/play-mongo/blob/master/README-CN.md).
+For chinese introduction, please refer to [README-CN.md](https://github.com/playcommunity/play-utils/blob/master/README-CN.md).
 
 # Introduction
 `Play-Utils` is a set of utilities for developing with [Play Framework](https://www.playframework.com/), including the following features:
