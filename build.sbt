@@ -1,7 +1,7 @@
 
 name := "play-utils"
 
-version := "0.2.0"
+version := "0.2.1"
 
 scalaVersion := "2.12.6"
 
@@ -15,10 +15,9 @@ homepage := Some(url("https://github.com/playcommunity/play-utils"))
 
 playBuildRepoName in ThisBuild := "play-utils"
 
-version in ThisBuild := "0.2.0"
+version in ThisBuild := "0.2.1"
 
-val akkaActor = "com.typesafe.akka" %% "akka-actor" % "2.5.4"
-val playGuice = "com.typesafe.play" %% "play-guice" % "2.6.5"
+val play = "com.typesafe.play" %% "play" % "2.6.18"
 val playScalaTest = "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % "test"
 
 val buildSettings = Seq(
@@ -38,7 +37,7 @@ lazy val root = Project(
 )
 .enablePlugins(PlayLibrary)
 .settings(buildSettings)
-.settings(libraryDependencies ++= Seq(playGuice, akkaActor, playScalaTest))
+.settings(libraryDependencies ++= Seq(play, playScalaTest))
 .settings(publishSettings)
 
 lazy val publishSettings = Seq(

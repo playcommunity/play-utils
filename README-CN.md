@@ -55,6 +55,8 @@ retry.withFixedDelay[Int](3, 1 seconds) { () =>
  .retryWhen(_ != 10)
 ```
 
+可以通过`withTaskName`方法为重试任务起个名字，以增强日志的可读性。 日志功能默认是开启的，如果你不想记录日志，可以通过`withLoggingEnabled`方法关闭日志功能。
+
 ## 1.2 重试策略
 某些场景下，固定时间重试可能会对远程服务造成冲击，因此`Retry`提供了多种策略供你选择。
 

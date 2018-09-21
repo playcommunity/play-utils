@@ -3,11 +3,26 @@ package retry
 import akka.actor.{ActorSystem, Scheduler}
 import akka.pattern.after
 import javax.inject.Inject
+import play.api.Logger
+
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
 import scala.util.Random
 
 trait Retryable[T] {
+
+  /**
+    * Set a name for this retry task for logging.
+    * @param taskName
+    * @return current retryable instance.
+    */
+  def withTaskName(taskName: String): Retryable[T]
+
+  /**
+    * Enable/disable logging.
+    * @return current retryable instance.
+    */
+  def withLoggingEnabled(enabled: Boolean): Retryable[T]
 
   /**
     * Set customized execution context.
@@ -57,9 +72,11 @@ abstract class BaseRetry[T](retries: Int, initialDelay: FiniteDuration, ec: Exec
   private var _retries = retries
   private var _ec: ExecutionContext = ec
   private var _scheduler: Scheduler = scheduler
+  private var _taskName: Option[String] = None
+  private var _isLoggingEnabled: Boolean = true
   protected var block : () => Future[T] = _
   protected var predicate : T => Boolean = _
-
+  protected val logger = Logger("retry")
   /**
     * Set an block/operation that will produce a Future[T].
     * @param block
@@ -69,6 +86,35 @@ abstract class BaseRetry[T](retries: Int, initialDelay: FiniteDuration, ec: Exec
     this.block = block
     this
   }
+
+  /**
+    * Set a name for this retry task for logging..
+    * @param ec
+    * @return current retryable instance.
+    */
+  def withTaskName(taskName: String): Retryable[T] = {
+    _taskName = Some(taskName)
+    this
+  }
+
+  /**
+    * Enable/disable logging.
+    * @return current retryable instance.
+    */
+  def withLoggingEnabled(enabled: Boolean): Retryable[T] = {
+    _isLoggingEnabled = enabled
+    this
+  }
+
+  protected def debug(msg: String): Unit = if (_isLoggingEnabled) logger.debug( _taskName.map(n => s"${n} - ${msg}").getOrElse(msg))
+
+  protected def info(msg: String): Unit = if (_isLoggingEnabled) logger.info( _taskName.map(n => s"${n} - ${msg}").getOrElse(msg))
+
+  protected def warn(msg: String): Unit = if (_isLoggingEnabled) logger.warn( _taskName.map(n => s"${n} - ${msg}").getOrElse(msg))
+
+  protected def error(msg: String): Unit = if (_isLoggingEnabled) logger.error( _taskName.map(n => s"${n} - ${msg}").getOrElse(msg))
+
+  protected def error(msg: String, t: Throwable): Unit = if (_isLoggingEnabled) logger.error( _taskName.map(n => s"${n} - ${msg}").getOrElse(msg), t)
 
   /**
     * Set customized execution context.
@@ -126,16 +172,26 @@ abstract class BaseRetry[T](retries: Int, initialDelay: FiniteDuration, ec: Exec
     _retries -= 1
     val f = try { block() } catch { case t => Future.failed(t) }
     f.flatMap{ res =>
-      if (_retries < 0 || predicate(res)) {
+      val isSuccess = predicate(res)
+      if (_retries < 0 || isSuccess) {
+        if (_retries < 0 && !isSuccess) error(s"Oops! retry finished with unexpected result: ${res}")
+        if (_retries != retries -1 && isSuccess) info(s"congratulations! retry finished with expected result: ${res}")
         f
       } else {
         val nextDelayTime = nextDelay(delay)
+        warn(s"invalid result ${res}, retry after ${nextDelayTime} for the ${retries - _retries} time.")
         after(nextDelayTime, scheduler)(retry(nextDelayTime, block))
       }
     }.recoverWith {
-      case _ if _retries >= 0 => {
+      case t if _retries >= 0 => {
         val nextDelayTime = nextDelay(delay)
+        error(s"${t.getMessage} error occurred, retry after ${nextDelayTime} for the ${retries - _retries} time.", t)
         after(nextDelayTime, scheduler)(retry(nextDelayTime, block))
+      }
+
+      case t if _retries < 0 => {
+        error(s"Oops! retry finished with unexpected error: ${t.getMessage}", t)
+        Future.failed(t)
       }
     }
   }
@@ -276,7 +332,6 @@ class Retry @Inject() (ec: ExecutionContext, actorSystem: ActorSystem) {
   * The entrance object for directly usage. There should be an implicit execution context and an implicit scheduler in scope.
   */
 object Retry {
-
   /**
     * Retry with a fixed delay strategy.
     * @param retries the max retry count.

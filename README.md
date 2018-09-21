@@ -56,6 +56,7 @@ retry.withFixedDelay[Int](3, 1 seconds) { () =>
  .withScheduler(s)
  .retryWhen(_ != 10)
 ```
+You can set a name for this retry task for better logs with `withTaskName` method. The logging is enabled default, if you want you can disabled it with `withLoggingEnabled` method.
 
 ## 1.2 Retry Strategies
 In some scenarios, fixed-time retry may impact remote services. So there are several useful candidate strategies.
