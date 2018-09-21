@@ -242,13 +242,13 @@ class Retry @Inject() (ec: ExecutionContext, actorSystem: ActorSystem) {
   /**
     * Retry with  a back-off delay strategy.
     * @param retries the max retry count.
-    * @param delay the initial delay for first retry.
+    * @param baseDelay the initial delay for first retry.
     * @param factor the product factor for the calculation of next delay.
     * @param ec execution context.
     * @param scheduler
     * @tparam T
     */
-  def withBackoffDelay[T](retries: Int, delay: FiniteDuration, factor: Double): BaseRetry[T] = new BackoffRetry[T](retries, delay, factor, ec, actorSystem.scheduler)
+  def withBackoffDelay[T](retries: Int, baseDelay: FiniteDuration, factor: Double): BaseRetry[T] = new BackoffRetry[T](retries, baseDelay, factor, ec, actorSystem.scheduler)
 
   /**
     * Retry with a jitter delay strategy.
@@ -290,13 +290,13 @@ object Retry {
   /**
     * Retry with  a back-off delay strategy.
     * @param retries the max retry count.
-    * @param delay the initial delay for first retry.
+    * @param baseDelay the initial delay for first retry.
     * @param factor the product factor for the calculation of next delay.
     * @param ec execution context.
     * @param scheduler
     * @tparam T
     */
-  def withBackoffDelay[T](retries: Int, delay: FiniteDuration, factor: Double)(implicit ec: ExecutionContext, scheduler: Scheduler): BaseRetry[T] = new BackoffRetry[T](retries, delay, factor, ec, scheduler)
+  def withBackoffDelay[T](retries: Int, baseDelay: FiniteDuration, factor: Double)(implicit ec: ExecutionContext, scheduler: Scheduler): BaseRetry[T] = new BackoffRetry[T](retries, baseDelay, factor, ec, scheduler)
 
   /**
     * Retry with a jitter delay strategy.
