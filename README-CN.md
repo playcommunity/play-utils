@@ -8,7 +8,7 @@
 ## 1.1 基本用法
 将以下依赖添加至`build.sbt`文件:
 ```
-libraryDependencies += "cn.playscala" %% "play-utils" % "0.2.0"
+libraryDependencies += "cn.playscala" %% "play-utils" % "0.2.1"
 ```
 最简单的重试策略是固定时间重试，即每次重试的时间间隔相同。 在开始编码之前，你需要将`Retry`实例依赖注入到需要的地方：
 ```

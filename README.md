@@ -11,7 +11,7 @@ For chinese introduction, please refer to [README-CN.md](https://github.com/play
 ## 1.1 Get started
 Add the following dependency to your `build.sbt`:
 ```
-libraryDependencies += "cn.playscala" %% "play-utils" % "0.2.0"
+libraryDependencies += "cn.playscala" %% "play-utils" % "0.2.1"
 ```
 FixedDelayRetry is the simplest retry strategy, it retries the next request with the same delay. Before coding, the instance of `Retry` should be injected where is needed: 
 ```
