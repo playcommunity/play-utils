@@ -43,6 +43,9 @@ trait Retryable[T] {
 /**
   * The base abstract class for different retry strategies.
   * The original inspiration comes from https://gist.github.com/viktorklang/9414163, thanks to Viktor Klang and Chad Selph.
+  * @FIXME Todo:
+  * - Remove mutable by builder pattern.
+  *
   * @param retries the max retry count.
   * @param initialDelay the initial delay for first retry.
   * @param ec execution context.
@@ -50,6 +53,7 @@ trait Retryable[T] {
   * @tparam T
   */
 abstract class BaseRetry[T](retries: Int, initialDelay: FiniteDuration, ec: ExecutionContext, scheduler: Scheduler) extends Retryable[T] {
+  @volatile
   private var _retries = retries
   private var _ec: ExecutionContext = ec
   private var _scheduler: Scheduler = scheduler
@@ -112,6 +116,9 @@ abstract class BaseRetry[T](retries: Int, initialDelay: FiniteDuration, ec: Exec
     * Retry and check the result with the predicate condition. Continue retrying if an exception is thrown.
     * Imagine that, if the retry method contains a retries parameter, when the result of after(...) expression is a Future[Throwable], then the body of recoverWith will continue with the same retries.
     * So retries parameter should be removed form retry method, we use an internal _retries to track the retry count.
+    * @FIXME Todo:
+    * - Remove _retries by Future.transform() with retries parameter.
+    *
     * @param block the operation which returns Future[T].
     * @return the successful Future[T] or the last retried result.
     */
