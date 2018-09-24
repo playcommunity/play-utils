@@ -1,7 +1,7 @@
 
 name := "play-utils"
 
-version := "0.2.1"
+version := "0.2.2"
 
 scalaVersion := "2.12.6"
 
@@ -15,7 +15,7 @@ homepage := Some(url("https://github.com/playcommunity/play-utils"))
 
 playBuildRepoName in ThisBuild := "play-utils"
 
-version in ThisBuild := "0.2.1"
+version in ThisBuild := "0.2.2"
 
 val play = "com.typesafe.play" %% "play" % "2.6.18"
 val playScalaTest = "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % "test"
