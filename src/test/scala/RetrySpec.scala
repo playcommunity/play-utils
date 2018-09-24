@@ -5,6 +5,7 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import retry.Retry
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
+import scala.language.postfixOps
 
 class RetrySpec extends PlaySpec with GuiceOneAppPerSuite {
   val retry = app.injector.instanceOf[Retry]
@@ -13,19 +14,18 @@ class RetrySpec extends PlaySpec with GuiceOneAppPerSuite {
     "return the last result when exceed the max retry count" in {
       val i = new AtomicInteger(0)
       val result = Await.result(
-        retry.withFixedDelay[Int](3, 1 seconds){ () =>
+        retry.withFixedDelay[Int](3, 1.seconds){ () =>
           Future.successful(i.addAndGet(1))
         }.stopWhen(_ == 10)
-      ,10 seconds)
+      ,10.seconds)
 
       result mustBe 4
     }
 
-
     "continue retrying when an exception is thrown" in {
       val i = new AtomicInteger(0)
       val result = Await.result(
-        retry.withFixedDelay[Int](3, 1 seconds){ () =>
+        retry.withFixedDelay[Int](3, 1.seconds){ () =>
           i.addAndGet(1)
           if (i.get() % 2 == 1) {
             Future.failed(new Exception)
@@ -82,5 +82,4 @@ class RetrySpec extends PlaySpec with GuiceOneAppPerSuite {
       (System.currentTimeMillis() - startTime)/1000 mustBe 4
     }
   }
-
 }
