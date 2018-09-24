@@ -4,6 +4,8 @@ import akka.actor.{ActorSystem, Scheduler}
 import akka.pattern.after
 import javax.inject.Inject
 import play.api.Logger
+
+import scala.annotation.tailrec
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
 import scala.util.{Failure, Random, Success}
@@ -277,6 +279,7 @@ object Retry {
   def withFibonacciDelay[T](retries: Int, baseDelay: FiniteDuration, taskName: String = "default",  enableLogging: Boolean = true)(implicit executionContext: ExecutionContext, scheduler: Scheduler): RetryTask[T] = {
     def nextDelay(retried: Int): FiniteDuration = {
       def fib(n: Int): Int = {
+        @tailrec
         def fib_tail(n: Int, a: Int, b: Int): Int = n match {
           case 0 => a
           case _ => fib_tail(n - 1, b, a + b)
