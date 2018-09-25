@@ -36,9 +36,6 @@ trait Retryable[T] {
 /**
   * The base abstract class for different retry strategies.
   * The original inspiration comes from https://gist.github.com/viktorklang/9414163, thanks to Viktor Klang and Chad Selph.
-  * @FIXME Todo:
-  * - Remove mutable by builder pattern.
-  *
   * @param retries the max retry count.
   * @param baseDelay the initial delay for first retry.
   * @param ec execution context.
